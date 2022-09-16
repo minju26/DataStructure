@@ -1,4 +1,4 @@
-<자료구조 제 11-1 연결리스트>
+<자료구조 8.11-1 연결리스트>
 
 리스트 : 여러 원소, 원소 간 순서관계가 존재함
  vs 
@@ -12,4 +12,87 @@
 		      길이의 제한이 없음
 		      연결 리스트 중간에 원소 삽입/삭제가 자유롭게 가능함
 
-- 
+(연결 리스트)
+
+- 노드(구조체)로 구성
+- 각각의 노드는 필요한 데이터 필드와 하나 이상의 링크 필드로 구성
+- 링크 필드는 다음 노드의 주소를 저장
+- 첫 번째 노드의 주소는 따로 저장, 잊어버려서는 안됨
+- 마지막 노드의 next 필드에는 NULL을 저장하여 연결리스트의 끝임을 표시함
+
+struct node{
+	char *data;
+	struct node *next;  <- 자기참조형 구조체
+};
+
+
+typedef struct node Node;
+Node *head = NULL;          <- 연결 리스트의 첫 번째 노드의 주소 저장 할 포인터 변수
+
+
+
+
+
+<자료구조 8.11-2 연결리스트>
+
+(3개의 노드로 연결된 리스트 실습 => 11-2-1.c)
+
+
+
+
+
+<자료구조 8.11-3 연결리스트>
+
+(연결리스트의 맨 앞에 새로운 노드 삽입하기)
+1. 새로운 노드를 만들고 추가할 데이터를 저장
+2. 새로운 노드의 next필드가 현재의 head노드를 가리키도록 하기
+3. 새로운 노드를 새로운 head노드로 하기
+
+# 새로운 노드를 새로운 head노드로 먼저 연결해버리면 기존에 haed가 가리키던 노드의 주소를
+    기억하는 변수가 없어짐 !!
+
+Node* tmp = (Node*)malloc(sizeof(Node));   //새로운 노드 만들기
+tmp->data = "A";
+tmp->next = head;  //새로운 노드의 next필드가 현재 필드의 head노드를 가리키도록 하기
+head = tmp;   //새로운 노드를 새로운 head노드로 하기
+
+=> 함수로 만들기 
+void add_first(char* item)
+{
+	Node* tmp = (Node*)malloc(sizeof(Node));
+	tmp->data = item;
+	tmp->next = head;
+	head = tmp;
+}
+
+# head가 전역변수인 경우에 할 수 있음 !
+# (char* item, Node* head)인 경우에는...
+   C언어에서 함수 호출 방식이 값에 의한 호출이기 때문에 head가 main함수의 지역변수의 경우 문제 발생
+
+   => 주소(포인터값)을 함수 매개변수로 받기로 해결 가능 !
+   void add_first(Node** ptr_head, char* item)           //포인터 변수 head의 주소를 매개변수로 받기
+{
+	Node* tmp = (Node*)malloc(sizeof(Node));
+	tmp->data = item;
+	tmp->next = *ptr_head;
+	*ptr_head = tmp;                                   //바뀐 head노드의 주소를 포인터 이용하여 변수 head에 쓰기
+}
+
+   => 함수 호출 시
+        add_first(&head, item_to_store);
+
+# head노드 주소를 return하는 함수도 가능
+Node* add_first(Node* head, char* item)
+{
+	Node* tmp = (Node*)malloc(sizeof(Node));
+	tmp->data = item;
+	tmp->next = head;
+	return tmp;             //새로운 head노드인 tmp의 주소를 return하기
+}
+  
+   => 함수 호출 시
+       head = add_first(head, item_to_store);
+
+# 내가 작성한 코드가 일반적인 경우만이 아니라 특수한 경우에도 문제없이 작동하는지 확인하기
+   예를들어, 이 경우에서는 기존의 연결 리스트의 길이가 0인경우, 즉 head가 NULL인 경우에도 문제없는지 확인 !
+
