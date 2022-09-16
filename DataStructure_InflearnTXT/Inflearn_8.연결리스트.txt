@@ -1,5 +1,7 @@
 <자료구조 8.11-1 연결리스트>
 
+▶리스트와 집합의 비교
+
 리스트 : 여러 원소, 원소 간 순서관계가 존재함
  vs 
 집합 : 여러 원소, 원소 간 순서관계가 존재하지 않음 
@@ -12,7 +14,7 @@
 		      길이의 제한이 없음
 		      연결 리스트 중간에 원소 삽입/삭제가 자유롭게 가능함
 
-(연결 리스트)
+▶연결 리스트
 
 - 노드(구조체)로 구성
 - 각각의 노드는 필요한 데이터 필드와 하나 이상의 링크 필드로 구성
@@ -22,12 +24,11 @@
 
 struct node{
 	char *data;
-	struct node *next;  <- 자기참조형 구조체
+	struct node *next;		//자기참조형 구조체
 };
 
-
 typedef struct node Node;
-Node *head = NULL;          <- 연결 리스트의 첫 번째 노드의 주소 저장 할 포인터 변수
+Node *head = NULL;		//연결 리스트의 첫 번째 노드의 주소 저장 할 포인터 변수
 
 
 
@@ -35,7 +36,7 @@ Node *head = NULL;          <- 연결 리스트의 첫 번째 노드의 주소 �
 
 <자료구조 8.11-2 연결리스트>
 
-(3개의 노드로 연결된 리스트 실습 => 11-2-1.c)
+▶3개의 노드로 연결된 리스트 실습 => 11-2-1.c
 
 
 
@@ -43,7 +44,8 @@ Node *head = NULL;          <- 연결 리스트의 첫 번째 노드의 주소 �
 
 <자료구조 8.11-3 연결리스트>
 
-(연결리스트의 맨 앞에 새로운 노드 삽입하기)
+▶연결리스트의 맨 앞에 새로운 노드 삽입하기
+
 1. 새로운 노드를 만들고 추가할 데이터를 저장
 2. 새로운 노드의 next필드가 현재의 head노드를 가리키도록 하기
 3. 새로운 노드를 새로운 head노드로 하기
@@ -51,10 +53,10 @@ Node *head = NULL;          <- 연결 리스트의 첫 번째 노드의 주소 �
 # 새로운 노드를 새로운 head노드로 먼저 연결해버리면 기존에 haed가 가리키던 노드의 주소를
     기억하는 변수가 없어짐 !!
 
-Node* tmp = (Node*)malloc(sizeof(Node));   //새로운 노드 만들기
+Node* tmp = (Node*)malloc(sizeof(Node));		//새로운 노드 만들기
 tmp->data = "A";
-tmp->next = head;  //새로운 노드의 next필드가 현재 필드의 head노드를 가리키도록 하기
-head = tmp;   //새로운 노드를 새로운 head노드로 하기
+tmp->next = head;			//새로운 노드의 next필드가 현재 필드의 head노드를 가리키도록 하기
+head = tmp;			//새로운 노드를 새로운 head노드로 하기
 
 => 함수로 만들기 
 void add_first(char* item)
@@ -66,16 +68,16 @@ void add_first(char* item)
 }
 
 # head가 전역변수인 경우에 할 수 있음 !
+
 # (char* item, Node* head)인 경우에는...
    C언어에서 함수 호출 방식이 값에 의한 호출이기 때문에 head가 main함수의 지역변수의 경우 문제 발생
-
    => 주소(포인터값)을 함수 매개변수로 받기로 해결 가능 !
-   void add_first(Node** ptr_head, char* item)           //포인터 변수 head의 주소를 매개변수로 받기
+   void add_first(Node** ptr_head, char* item)		//포인터 변수 head의 주소를 매개변수로 받기
 {
 	Node* tmp = (Node*)malloc(sizeof(Node));
 	tmp->data = item;
 	tmp->next = *ptr_head;
-	*ptr_head = tmp;                                   //바뀐 head노드의 주소를 포인터 이용하여 변수 head에 쓰기
+	*ptr_head = tmp;				//바뀐 head노드의 주소를 포인터 이용하여 변수 head에 쓰기
 }
 
    => 함수 호출 시
@@ -91,8 +93,241 @@ Node* add_first(Node* head, char* item)
 }
   
    => 함수 호출 시
-       head = add_first(head, item_to_store);
+        head = add_first(head, item_to_store);
 
 # 내가 작성한 코드가 일반적인 경우만이 아니라 특수한 경우에도 문제없이 작동하는지 확인하기
    예를들어, 이 경우에서는 기존의 연결 리스트의 길이가 0인경우, 즉 head가 NULL인 경우에도 문제없는지 확인 !
 
+
+
+
+
+<자료구조 8.11-4 연결리스트>
+
+▶어떤 노드 뒤에 새로운 노드 삽입하기
+
+1. 새로운 노드를 만들고 데이터 저장하기
+2. 새로운 노드의 next필드가 prev의 다음 노드를 가리키도록 하기
+3. 새로운 노드를 prev의 다음 노드로 만들기
+
+# prev의 next필드가 새로운 노드가 되도록 먼저 연결해버리면 기존의 prev노드의 다음 노드의 주소를
+   기억하는 변수가 없어짐 !!
+
+Node* tmp = (Node*)malloc(sizeof(Node));		//새로운 노드 만들기
+tmp->data = data_to_store;
+tmp->next = prev->next;		//새로운 노드의 next필드가 prev노드의 next필드가 가리키는 노드를 가리키도록 하기
+prev->next = tmp;			//prev노드의 next필드에 새로운 노드 연결하기
+
+=> 함수로 만들기 (삽입 성공은 1, 실패는 0을 반환)
+int add_after(Node* prev, char* item)
+{
+	if (prev == NULL)
+	{
+		return 0;
+	}
+	
+	Node* tmp = (Node*)malloc(sizeof(Node));
+	tmp->data = item;
+	tmp->next = prev->next;
+	prev->next = tmp;
+
+	return 1;
+}
+
+# 연결리스트에 새로운 노드를 삽입할 때, 삽입할 위치의 바로 앞 노드의 주소가 필요함
+   따라서 어떤 노드의 뒤에 삽입하는 것은 간단하지만, 어떤 노드의 앞에 삽입하는 것은 간단하지 않음 !
+   -> insert_before()은 잘 안함
+
+▶첫번째 노드의 삭제
+
+head가 현재 head 노드이 다음 노드를 가리키게 만들기
+head = head->next;
+
+=> 함수로 만들기(head는 전역변수)
+Node* remove_first()
+{
+	if (head == NULL)		//노드가 하나도 없다는 뜻
+	{
+		return NULL;
+	}
+	else
+	{
+		Node* tmp = head;
+		head = head->next;
+		return tmp;	//연결 리스트에서 제거된 기존 head노드의 주소값 return, 필요 없다면 free하기
+	}
+}
+
+▶어떤 노드의 다음 노드 삭제
+
+prev의 다음 노드가 null이 아니라면 prev의 next 필드가 현재 next필드의 다음 노드를 가리키게 만들기
+
+if (prev->next != NULL)
+{
+	prev->next = prev->next->next;
+}
+
+=> 함수로 만들기
+Node* remove_after(Node* prev)
+{
+	Node* tmp = prev->next;
+	if (tmp == NULL)		//삭제할 노드가 없다는 뜻
+	{
+		return NULL;
+	}
+	else
+	{
+		prev->next = tmp->next;		//tmp == prev->next , tmp->next == prev->next->next
+		return tmp;
+	}
+}
+
+# 단순 연결 리스트에 어떤 노드를 삭제할 때는 삭제할 노드의 바로 앞 노드의 주소가 필요함
+   삭제할 노드의 주소만으로는 삭제 할 수 없음 !
+
+▶연결리스트 순회하기 _ 1.
+
+순회 : 처음부터 순서대로 방문 / traverse / 순회의 목적은 어떠한 노드를 찾기 위함임
+
+Node* finde(char* word)
+{
+	Node* p = head;		//첫 번째 노드를 가리키는 p
+	while (p != NULL)
+	{
+		if (strcmp(p->data, word) == 0)	//string compare, returns 0 if both the strings are the same
+		{
+			return p;
+		}
+		p = p->next;	//다음 노드로 넘어가기
+	}
+	return NULL;	//순회가 끝났지만 원하는 것을 찾지 못함
+}
+
+
+
+
+
+<자료구조 8.11-5 연결리스트>
+
+▶연결리스트 순회하기 _ 2. 연결리스트의 index번 째 노드의 주소 return
+
+Node* get_node(int index)
+{
+	if (index < 0)		//예외처리
+	{
+		return NULL;
+	}
+	Node* p = head;
+	for (int i = 0; i < index && p != NULL; i++)
+	{
+		p = p->next;
+	}
+	return p;
+}
+
+▶연결리스트 순회하기 _ 3. 연결리스트의 index번 째 위치에 새로운 노드 삽입
+
+int add(int index, char* item)
+{
+	if (index < 0)		//예외처리
+	{
+		return 0;
+	}
+
+	//추가되는 위치가 맨 앞인 경우
+	if (index == 0)
+	{
+		add_first(item);
+		return 1;
+	}
+	
+	//추가되는 위치가 맨 앞이 아닌 경우
+	Node* prev = get_node(index - 1);
+	if (prev != NULL)
+	{
+		add_after(prev, item);
+		return 1;
+	}
+	return 0;
+}
+
+▶연결리스트 순회하기 _ 4. 연결리스트의 index번 째 노드 삭제, 해당 노드 주소 return
+
+Node* remove(int index)
+{
+	if (index < 0)
+	{
+		return NULL;
+	}
+	
+	if (index == 0)
+	{
+		return remove_first();
+	}
+	
+	Node* prev = get_node(index - 1);
+	if (prev == NULL)
+	{
+		return NULL;
+	}
+	else
+	{
+		return remove_after(prev);
+	}
+}
+
+▶연결리스트 순회하기 _ 5. 연결리스트에서 item데이터를 가진 노드 삭제하기
+
+# 어떠한 노드를 삭제할 때, 해당 노드의 앞 노드 주소가 필요함
+   따라서 두 개의 포인터 사용 !
+
+Node* remove(char* item)
+{
+	Node* p = head;
+	Node* q = NULL;			//p의 직전 노드를 위한 포인터
+	while (p != NULL && strcmp(p->data, item) != 0)
+	{
+		q = p;			//현재 p가 가리키는 노드를 q에 넘겨주고
+		p = p -> next;		//p는 다음 노드로 전진 -> q는 항상 p의 직전 노드
+	}
+	
+	//찾는 item데이터가 없음
+	if (p == NULL)
+	{
+		return NULL;
+	}
+	
+	if (q == NULL)			//첫 번째 노드가 삭제해야 할 경우
+	{
+		return remove_first();
+	}
+	else				//첫 번째 노드가 아닌 노드가 item데이터를 가진 경우
+	{
+		return remove_after(q);
+	}
+}
+
+▶연결리스트 순회하기 _ 6. 오름차순 정렬되어있는 연결리스트에 새로운 데이터 삽입
+
+# 어떠한 노드를 추가할 때, 해당 노드의 앞 노드 주소가 필요함
+   따라서 두 개의 포인터 사용 !
+
+void add_to_ordered_list(char* item)
+{
+	Node* p = head;
+	Node* q = NULL;
+	while (p != null && strcmp(p->data, item) <= 0)
+	{
+		q = p;			//현재 p가 가리키는 노드를 q에 넘겨주고
+		p = p->next;		//p는 다음 노드로 전진 -> q는 항상 p의 직전 노드
+	}
+
+	if (q == NULL)			//첫 번째 노드에 삽입해야 할 경우
+	{
+		add_first(item);
+	}
+	else				//첫 번째 노드가 아닌 노드 다음에 삽입해야 할 경우
+	{
+		add_after(q);
+	}
+}
